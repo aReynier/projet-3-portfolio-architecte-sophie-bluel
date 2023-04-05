@@ -23,6 +23,20 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+
+body {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	flex-grow: 1;
+}
+
+strong {
+	font-weight: 700;
+}
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
@@ -98,6 +112,17 @@ nav li {
 li:hover {
 	color: #B1663C;
 }
+
+nav li a {
+	color:black;
+	text-decoration: none;
+}
+
+nav li a:hover {
+	color: #B1663C;
+	text-decoration: none;
+}
+
 #introduction {
 	display: flex;
 	align-items: center;
@@ -137,34 +162,37 @@ li:hover {
 	width: 100%;
 
 }
-#contact {
+#contact, #login {
 	width: 50%;
-margin: auto;
+	margin: auto;
 }
-#contact > * {
+#login{
+	margin-top: 75px;
+}
+#contact > *, #login > * {
 	text-align: center;
 
 }
-#contact h2{
+#contact h2, #login h2{
 	margin-bottom: 20px;
 }
-#contact form {
+#contact form, #login form {
 	text-align: left;
 	margin-top:30px;
 	display: flex;
 	flex-direction: column;
 }
 
-#contact input {
+#contact input, #login input {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
-#contact label {
+#contact label, #login label {
 	margin: 2em 0 1em 0;
 }
-#contact textarea {
+#contact textarea, #login textarea {
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
@@ -180,9 +208,54 @@ input[type="submit"]{
 	border-radius: 60px ;
 }
 
+#login a {
+	color: black;
+}
+
 footer nav ul {
 	display: flex;
 	justify-content: flex-end;
 	margin: 2em
+}
+
+.filterContainer{
+    grid-column: 1 / 4;
+    grid-row: 1;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0;
+}   
+
+.filterButton {
+    font-family: 'Syne';
+    font-weight: 700;
+    font-size: 1.2em;
+    color: #1D6154;
+	background-color: white;
+    text-align: center;
+    border-radius: 40px;
+    padding: 8px 20px;
+    border: 1px solid #1D6154;
+	cursor: pointer;
+}
+
+
+.buttonClicked {
+	background-color: #1D6154;
+	color: white;
+}
+
+.testButtonActive{
+	background-color: orange;
+}
+
+.red {
+	background-color: red;
+}
+
+#loginMessage {
+	margin-top: 30px;
+	color:red;
 }
 
