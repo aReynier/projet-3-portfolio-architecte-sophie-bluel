@@ -10,7 +10,7 @@
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
 </head>
-<body>
+<body id="global">
 <header>
     <h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
     <nav>
@@ -27,10 +27,10 @@
         <h2>Log in</h2>
         <form id="signIn" action="index.html" method="post">
 			<label for="email">Email</label>
-			<input type="email" name="email" id="email" required>
+			<input type="email" name="email" id="email" class="login-input" required>
 			<label for="password">Mot de passe</label>
-			<input type="password" id="password" required>
-			<input type="submit" value="Se connecter">
+			<input type="password" id="password" class="login-input" required>
+			<input type="submit" value="Se connecter" id="login-submit">
 			<!--alternative aux champs requis en javascript: required-->
 		</form>
         <p><a href="">Mot de passe oublié</a></p>

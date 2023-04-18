@@ -9,42 +9,25 @@ emailError.innerText = "Erreur dans l’identifiant ou le mot de passe";
 const parentToAppend = document.getElementById("loginMessage");
 
 //évènement une fois que l'utilisateur clique sur "se connecter"
-const getDataTest = document.getElementById("signIn").addEventListener("submit", (event) => {
+const getDataTest = document.getElementById("signIn").addEventListener("submit", async (event) => {
+    //permet d'éviter le comportement par défaut de rechargement de page
+    event.preventDefault();
     try {
-        event.preventDefault();
         const valueUserEmail = userEmail.value;
         const valueUserPassword = userPassword.value;
 
-        //test local storage 1
-        console.log("email enregistré");
-        localStorage.setItem("user email", userEmail.value);
-        const storageEmail = localStorage.getItem("user email");
-        console.log(storageEmail);
-
-        //test local storage 2
-        const user = {
-            email: userEmail.value,
-            password: userPassword.value
-        };
-        localStorage.setItem("identifiants", JSON.stringify(user));
-        console.log(user);
-
-        testLogin(valueUserEmail, valueUserPassword);
+        const userToken = await testLogin(valueUserEmail, valueUserPassword);
         
-        const userToken = JSON.parse(localStorage.getItem("token"));
         console.log(userToken);
         console.log(userToken.userId);
 
-        //à revoir, comportement imparfait, message d'erreur'qui persiste
+        //à revoir, comportement imparfait, message d'erreur qui persiste
         //si première identification ratée
-        if (userToken.userId === undefined) {
-            //permet d'éviter le comportement par défaut de rechargement de page
-            //event.preventDefault();
+        if (!userToken) {
             //affichage du message d'erreur
             parentToAppend.innerHTML = "";
             parentToAppend.appendChild(emailError);
         } else {
-            parentToAppend.innerHTML = "";
             alert("connexion réussie");
             window.location.href = "index.html"
         };
@@ -75,6 +58,7 @@ const testLogin = async (valueUserEmail, valueUserPassword) => {
         console.log(token);
         const strigifiedToken = JSON.stringify(token);
         localStorage.setItem("token", strigifiedToken);
+        return token;
     } catch (err) {
         console.error(err);
     };
