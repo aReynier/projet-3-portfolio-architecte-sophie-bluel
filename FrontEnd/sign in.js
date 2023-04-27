@@ -1,5 +1,5 @@
 
-// Début du code du login
+// Récupération des éléments du form
 let userEmail = document.getElementById("email");
 let userPassword = document.getElementById("password");
 
@@ -9,7 +9,7 @@ emailError.innerText = "Erreur dans l’identifiant ou le mot de passe";
 const parentToAppend = document.getElementById("loginMessage");
 
 //évènement une fois que l'utilisateur clique sur "se connecter"
-const getDataTest = document.getElementById("signIn").addEventListener("submit", async (event) => {
+const getData = document.getElementById("signIn").addEventListener("submit", async (event) => {
     //permet d'éviter le comportement par défaut de rechargement de page
     event.preventDefault();
     try {
@@ -17,25 +17,17 @@ const getDataTest = document.getElementById("signIn").addEventListener("submit",
         const valueUserPassword = userPassword.value;
 
         const userToken = await testLogin(valueUserEmail, valueUserPassword);
-        
-        console.log(userToken);
-        console.log(userToken.userId);
-
-        //à revoir, comportement imparfait, message d'erreur qui persiste
-        //si première identification ratée
         if (!userToken) {
             //affichage du message d'erreur
             parentToAppend.innerHTML = "";
             parentToAppend.appendChild(emailError);
         } else {
-            alert("connexion réussie");
             window.location.href = "index.html"
         };
 
     } catch (error) {
         console.log(error);
-    }
-
+    };
 });
 
 const testLogin = async (valueUserEmail, valueUserPassword) => {
@@ -55,9 +47,12 @@ const testLogin = async (valueUserEmail, valueUserPassword) => {
         });
         console.log("server status: " + responseLogin.status + responseLogin);
         const token = await responseLogin.json();
-        console.log(token);
         const strigifiedToken = JSON.stringify(token);
-        localStorage.setItem("token", strigifiedToken);
+        sessionStorage.setItem("token", strigifiedToken);
+
+        if(responseLogin.status !== 200){
+            return false;
+        };
         return token;
     } catch (err) {
         console.error(err);

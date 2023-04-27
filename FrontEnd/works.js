@@ -4,7 +4,6 @@ const allWorks = async () => {
         const responseWorks = await fetch("http://localhost:5678/api/works");
         console.log("server status: " + responseWorks.status);
         const data = await responseWorks.json();
-        console.log(data);
         return data;
     }catch(err){
         console.error(err);
@@ -16,18 +15,20 @@ const allWorks = async () => {
 const workFrame = document.querySelector(".gallery");
 const sortFrame = document.querySelector("#sort-container");
 
+
+//récupération des travaux filtrés
 const filteredWorks = async (categoryName) => {
     try {
         workFrame.innerHTML="";
         const filteredWorks = await allWorks();
-        const result = filteredWorks.filter((element) => element.category.name == categoryName);
-        console.log(result);
+        const result = filteredWorks.filter((element) => element.category.name === categoryName);
         getFilteredWorks(result);
     }catch(err){
         console.log(err);
     };
 };
 
+//partie boutons de filtrage
 //création du conteneur des boutons filtres
 const filterContainer = document.createElement("div");
 filterContainer.setAttribute("class","filterContainer");
@@ -40,7 +41,6 @@ const displayButton = () => {
 //suppresion de la couleur sur les boutons non sélectionnés
 const removeOtherButtonsColor = (e) => {
     Array.from(document.querySelectorAll('.filterButton')).map(function(otherButton) {
-                console.log(otherButton);
                 otherButton.classList.remove("buttonClicked");
       });
       e.target.classList.add("buttonClicked");
@@ -56,7 +56,7 @@ const createButton = (buttonTitle, categoryName, isItAllTheWork) => {
         };
 
         button.addEventListener("click", (e) => {
-        if(isItAllTheWork == true){
+        if(isItAllTheWork === true){
             button.classList.add("buttonClicked");
             getAllWorks();
         }else{ 
@@ -68,6 +68,8 @@ const createButton = (buttonTitle, categoryName, isItAllTheWork) => {
     filterContainer.appendChild(button);
 };
 
+//ajout des boutons
+//note: lors d'ajout de nouveau bouton, penser à rajouter la catégorie dans le form
 const buttonAll = createButton("tous", "Objets", true);
 const buttonObject = createButton("Objets", "Objets", false);
 const buttonAppartment = createButton("Appartements", "Appartements", false);
@@ -92,7 +94,8 @@ const buttonHotel = createButton("Hôtels & restaurants", "Hotels & restaurants"
 // };
 // test();
 
-//Récupération des travaux
+//Partie récupération des travaux
+//récupation de tous les travaux
 const getAllWorks = async () => {
     try {
         const allTheWorks = await allWorks(); 
@@ -126,6 +129,8 @@ const getFilteredWorks = (works) => {
     };
 };
 
+
+//appel de la fonction permettant d'afficher tous les travaux
 getAllWorks();
 displayButton();
 
@@ -133,7 +138,7 @@ displayButton();
 
 //création de affichage de l'en-tête d'amninistration
 const adminHeader = () => {
-    const globalBody = document.querySelector(".test");
+    const globalBody = document.querySelector("#head");
     const adminHeaderBar = document.createElement("div");
     adminHeaderBar.setAttribute("class","admin-header admin admin-disconnected");
     const adminHeaderContainer = document.createElement("div");
@@ -146,6 +151,7 @@ const adminHeader = () => {
     const publishButton = document.createElement("button");
     publishButton.setAttribute("class","publish");
     publishButton.innerText = "publier les changements";
+    logOut(publishButton);
 
     globalBody.appendChild(adminHeaderBar);
     adminHeaderBar.appendChild(adminHeaderContainer);
@@ -153,6 +159,14 @@ const adminHeader = () => {
     adminHeaderContainer.appendChild(adminHeaderText);
     adminHeaderBar.appendChild(publishButton);
 };
+
+//fonction de deconnexion
+const logOut = (logoutButton) => {
+    logoutButton.addEventListener( "click", () => {
+        sessionStorage.removeItem("token");
+        location.reload();
+    })
+}
 
 //création et affichage des liens d'administrations de section spécifique
 const adminLinks = (idChildName, parentName) => {
@@ -197,24 +211,66 @@ const createBaseModal = () => {
     modalContainer.appendChild(modalWindow);
 }
 
-//token permettant de vérifier si l'utilisateur est connecté
-//ajout du code html lié à l'administration
-const userToken = JSON.parse(localStorage.getItem("token"));
-if (userToken.userId) {
-    alert("l'utilisateur est connecté");
-    adminHeader();
-    adminLinks("edit-picture", editPictureLink);
-    adminLinks("edit-biography", editBiographyLink);
-    adminLinks("edit-project", editPortfolioLink);
-    createBaseModal();
-    Array.from(document.querySelectorAll('.admin')).map(function(admin) {
-        admin.classList.remove("admin-disconnected");
-    });
-}else{
-    Array.from(document.querySelectorAll('.admin')).map(function(admin) {
-        admin.classList.add("admin-disconnected");
+
+//affichage de la fenêtre modale au clic sur le lien du portfolio
+const displayModal = () => {
+    const projectModal = document.querySelector("#edit-project");
+    projectModal.addEventListener("click", (event) => {
+        event.preventDefault();
+        modalWindow = document.querySelector("#modal");
+        modalWindow.classList.remove("modal-hidden");
+        // regarder pour le remettre lors de la fermeture de la modale
+        modalWindow.removeAttribute("aria-hidden");
+        modalWindow.setAttribute("aria-modal","true");
     });
 };
+
+
+//token permettant de vérifier si l'utilisateur est connecté
+//ajout du code html lié à l'administration
+//ajouter une alert déconnection si unothorized
+//le contenu de cet alert sera "vous avez été déconnecté, veuillez vous reconnecter"
+isUserTokenFunction = () => {
+    const userToken = sessionStorage.getItem("token");
+        if(userToken){
+            return true;
+        } else {
+            return false;
+        };
+};
+
+const thereIsUserToken = () => {
+    createBaseModal();
+    const isUserToken = sessionStorage.getItem("token");
+    if(isUserTokenFunction()){
+        userToken = JSON.parse(isUserToken);
+        if (userToken.userId) {
+            adminHeader();
+            adminLinks("edit-picture", editPictureLink);
+            adminLinks("edit-biography", editBiographyLink);
+            adminLinks("edit-project", editPortfolioLink);
+            displayModal();
+            Array.from(document.querySelectorAll('.admin')).map(function(admin) {
+                admin.classList.remove("admin-disconnected");
+            });
+        }else{
+            Array.from(document.querySelectorAll('.admin')).map(function(admin) {
+                admin.classList.add("admin-disconnected");
+            });
+        };
+    };
+};
+
+thereIsUserToken();
+
+
+//fonction de déconnection si token périmé
+const tokenStatus = (ServerStatus) => {
+    if(serverStatus !== 200){
+        alert("Vous avez été déconnecté, veuillez vous reconnecter");
+        sessionStorage.removeItem("token");
+    };
+}
 
 //évènement au clic sur la corbeille de chaque projet
 const deleteProject = () => {
@@ -224,9 +280,10 @@ const deleteProject = () => {
             //la page se recharge après la suppression d'un projet
             event.preventDefault();
             if(confirm("Voulez-vous supprimer ce projet?")){
-                console.log(icon.id);
                 const token = getToken();
                 await actionDeleteProject(icon.id, token);
+                adminGetAllWorks();
+                getAllWorks();
                 return false;
             };
         }, false );
@@ -236,7 +293,7 @@ const deleteProject = () => {
 //requête fetch permettant de s'assurer que le bon travail à suprpimer soit choisi
 const getToken = () => {
     try {
-        const stringifiedToken = localStorage.getItem("token");
+        const stringifiedToken = sessionStorage.getItem("token");
         const parsedToken = JSON.parse(stringifiedToken);
         const token = parsedToken.token;
         return token;
@@ -256,7 +313,6 @@ const actionDeleteProject = async (projectNumber, token) => {
                 "authorization": "Bearer " + token 
             },
         });
-        alert("test");
         return responseDelete;
     } catch (err) {
         console.error(err);
@@ -264,13 +320,16 @@ const actionDeleteProject = async (projectNumber, token) => {
     };
 };
 
-//a moitié fonctionnel: suppression de tous les projets
+//suppression de tous les projets
 const actionDeleteAllProjects = async (token) => {
     try {
-        // const works = await allWorks(); 
-        // for (let i = 0; i <= works.length; i++){
-        for (let i = 0; i <= 1000; i++){
-        const responseDeleteAll = await fetch("http://localhost:5678/api/works/"+ i, {
+        const works = await allWorks(); 
+            let projectId = [];
+            for (let i = 0; i < works.length; i++){
+                projectId.push(works[i].id);
+            };
+        for (let i = 0; i < projectId.length; i++){
+        const responseDeleteAll = await fetch("http://localhost:5678/api/works/" + projectId[i], {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json;charset=utf-8",
@@ -370,28 +429,21 @@ const createModalWindow = () => {
 createModalWindow();
 
 //event listener pour supprimer tous les travaux
-const deleteAllWorks = document.querySelector("#delete");
-deleteAllWorks.addEventListener("click", (event) => {
-    event.preventDefault();
-    if(confirm("attention, cette action supprimera tous les projets publiés de façon irréversible, êtes-vous sûr?")){
-        actionDeleteAllProjects(getToken());
-    };
-});
-
-//affichage de la fenêtre modale au clic sur le lien du portfolio
-const displayModal = () => {
-    const projectModal = document.querySelector("#edit-project");
-    projectModal.addEventListener("click", (event) => {
+const eventDeleteAllWorks = () => {
+    const deleteAllWorks = document.querySelector("#delete");
+    deleteAllWorks.addEventListener("click", async (event) => {
         event.preventDefault();
-        modalWindow = document.querySelector("#modal");
-        modalWindow.classList.remove("modal-hidden");
-        // regarder pour le remettre lors de la fermeture de la modale
-        modalWindow.removeAttribute("aria-hidden");
-        modalWindow.setAttribute("aria-modal","true");
+        if(confirm("attention, cette action supprimera tous les projets publiés de façon irréversible, êtes-vous sûr?")){
+            await actionDeleteAllProjects(getToken());
+            // setTimeout(() => {
+                adminGetAllWorks();
+                getAllWorks()
+            // }, 0);
+        };
     });
 };
 
-displayModal();
+eventDeleteAllWorks();
 
 //fonction générale de fermeture de la modale
 closeModal = () => {
@@ -428,10 +480,8 @@ closeModalClickOut();
 //fermeture de la fenêtre modale à l'appui de la touche Escape
 const closeModalKey = () => {
     document.addEventListener("keydown", (event) => {
-        console.log(event.key);
         modalWindow = document.querySelector(".modal");
-        // note: la triple égalité ne fonctionne pas sur firefox
-        if(event.key == "Escape" || event.key == "Esc" || event.keCode == 32) {
+        if(event.key === "Escape" || event.key === "Esc" || event.keCode === 32) {
             closeModal();
         };
     });
@@ -439,23 +489,166 @@ const closeModalKey = () => {
 
 closeModalKey();
 
-//bouton ajouter photo
-const addPhoto = () => {
-    const addPhotoButton = document.querySelector(".submit-photo-content-button");
-    addPhotoButton.addEventListener("click", () => {
-        alert("ajouter photo");
-    });
-};
-
 //bouton valider: ajouter projet
 const addProject = () => {
+    try {
     const addPhotoButton = document.querySelector("#submit-photo-form-submit");
-    addPhotoButton.addEventListener("click", () => {
-        alert("ajouter projet");
+    addPhotoButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        let imageUrl = document.querySelector("#new-project-image");
+        let title = document.querySelector("#title");
+        let categoryId = document.querySelector("#category");
+
+        const message = document.querySelector(".missing-information");
+        if(!imageUrl.value || !title.value || !categoryId.value){
+            message.classList.remove("no-missing-information");
+            return
+        }
+
+        const imageFile = imageUrl.files[0];
+        const imageprojectImageUrl = new FileReader();
+
+        extractImageUrl = imageprojectImageUrl.readAsDataURL(imageFile);
+
+        let projectImageUrl = imageFile;
+        let projectTitle = title.value;
+        let projectCategoryId = categoryId.value;
+
+        message.classList.add("no-missing-information");
+        await sendNewprojectFiles(projectImageUrl,projectTitle,projectCategoryId);
+        document.getElementById("button-submit-photo-form").reset();
+        removeDisplayImage();
+        getAllWorks()
+    });
+    }catch(err){
+        console.log(err);
+    }
+};
+
+
+//partie ajout de l'image de prévilusalisation
+const testSizePreviewImage = () => {
+    let imageUrl = document.querySelector("#new-project-image");
+    imageUrl.addEventListener("change", () => {
+        if(imageUrl.files[0].size > 4000000){
+            alert("le fichier est trop lourd, il ne sera pas chargé");
+        }else{
+            previewImage();
+        };
     });
 };
 
-//fenêtre suivante de la modale, permettant d'ajouter un projet au portfolio
+
+const previewImage = () => {
+    let imageUrl = document.querySelector("#new-project-image");
+        const fileExtentionRegex = /\.(jpe?g|png)$/i;
+        if(imageUrl.files.length === 0 || !fileExtentionRegex.test(imageUrl.files[0].name)){
+                return;
+            }
+        const imageDiv = document.querySelector(".submit-photo-preview-image");
+        // imageDiv.setAttribute("src",imageUrl.files[0].name);
+        const div = document.querySelector(".submit-photo-preview");
+        div.classList.remove("submit-no-photo-preview");
+
+        const file = imageUrl.files[0];
+        const fileReader = new FileReader();
+
+        fileReader.readAsDataURL(file);
+
+        fileReader.addEventListener("load", (event) => {
+            displayImage(event, file);
+            const submitButton = document.querySelector("#submit-photo-form-submit");
+            submitButton.classList.add("green");
+        });
+
+    const displayImage = (event, file) => {
+        const imageDiv = document.querySelector(".submit-photo-preview-image");
+        imageDiv.src = event.target.result;
+        const addPhotoButton = document.querySelector("#image-preview");
+        addPhotoButton.classList.add("submit-no-photo-preview");
+        const trashIcon = document.querySelector("#preview-trash");
+        trashIcon.addEventListener("click", () => {
+            removeDisplayImage();
+        });
+    };
+};
+
+const removeDisplayImage = () => {
+
+        const addPhotoButton = document.querySelector("#image-preview");
+
+        const div = document.querySelector(".submit-photo-preview");
+        div.classList.add("submit-no-photo-preview");
+        addPhotoButton.classList.remove("submit-no-photo-preview");
+        // imageDiv.src = "";
+        const submitButton = document.querySelector("#submit-photo-form-submit");
+        submitButton.classList.remove("green");
+};
+
+const getUserId = () => {
+    try {
+        const stringifiedToken = sessionStorage.getItem("token");
+        const parsedToken = JSON.parse(stringifiedToken);
+        const userId = parsedToken.userId;
+        return userId;
+    }catch(err){
+        console.log(err);
+    }
+};
+
+//partie de code servant à ajouter un nouveau projet au moyen de formData
+const sendNewprojectFiles = async (imageUrl, title, category) => {
+    try {
+    const projectTitle = title;
+    const projectImageUrl = imageUrl;
+    const projectCategoryId = category;
+
+    let sendNewProject = new FormData();
+    sendNewProject.append("image", projectImageUrl);
+    sendNewProject.append("title", projectTitle);
+    sendNewProject.append("category", projectCategoryId);
+
+    const array = Array.from(sendNewProject);
+    
+    const stringifiedProject = array[0];
+    const stringifiedProject2 = JSON.stringify(stringifiedProject[1]);
+    
+    let object = {};
+    sendNewProject.forEach((value, key) => (object[key] = value));
+    await fetchSendProjectFile(getToken(), sendNewProject);
+    newProjectConfirmation();
+    }catch(err){
+        console.error(err);
+    };
+};
+
+//notification d'ajout de projet
+const newProjectConfirmation = () => {
+    const divNewProject = document.querySelector(".new-project");
+    divNewProject.classList.add("class","sent");
+    setTimeout( ()=> {
+        divNewProject.classList.remove("sent");
+    }, 1000);
+}
+
+const fetchSendProjectFile = async (token, project) => {
+    try {
+        const sendProject = await fetch("http://localhost:5678/api/works", {
+            method: "POST",
+            headers: {
+                // "Content-Type": "multipart/formData",
+                // "accept": "application/json",
+                "authorization": "Bearer " + token 
+            },
+            body: project
+        });
+    } catch (err) {
+        console.error(err);
+        alert("l'ajout du projet a échoué, cause: " + sendProject.status);
+    };
+};
+
+//fenêtre suivante de la modale, permettant d'ajouter un projet à la galerie
 const modalWindowAddPhoto = () => {
     const buttonSubmitPhoto = document.querySelector(".modal-button");
     buttonSubmitPhoto.addEventListener("click", () => {
@@ -475,18 +668,43 @@ const modalWindowAddPhoto = () => {
         
         const submitPhotoFrame = document.createElement("div");
         submitPhotoFrame.setAttribute("class","submit-photo-frame");
+        const submitPhotoPreview = document.createElement("div");
+        submitPhotoPreview.setAttribute("class","submit-photo-preview submit-no-photo-preview");
+        submitPhotoPreviewImage = document.createElement("img");
+        submitPhotoPreviewImage.setAttribute("class","submit-photo-preview-image");
+        submitPhotoPreviewImage.setAttribute("src","");
+        submitPhotoPreviewImage.setAttribute("alt","prévisualisation de l'image");
+        
+        const divPreviewTrashIcon = document.createElement("div");
+        divPreviewTrashIcon.setAttribute("class","icon-container preview-container-icon-trash");
+        const previewTrashIcon = document.createElement("i");
+        previewTrashIcon.setAttribute("class", "fa-solid fa-trash-can");
+        previewTrashIcon.setAttribute("id","preview-trash");
+        
         const submitPhotoContentIcon = document.createElement("i");
         submitPhotoContentIcon.setAttribute("class","fa-sharp fa-regular fa-image");
-        const submitPhotoContentButton = document.createElement("button");
+
+        const submitPhotoForm = document.createElement("form");
+        submitPhotoForm.setAttribute("class","submit-photo-form");
+        submitPhotoForm.setAttribute("id","button-submit-photo-form");
+
+        const submitPhotoContentButton = document.createElement("input");
         submitPhotoContentButton.setAttribute("class","submit-photo-content-button");
+        submitPhotoContentButton.setAttribute("id","new-project-image");
+        submitPhotoContentButton.setAttribute("type","file");
+        submitPhotoContentButton.setAttribute("name","image");
+        submitPhotoContentButton.setAttribute("accept","image/png, image/jpeg");
+        submitPhotoContentButton.required = true;
         submitPhotoContentButton.innerText="+ Ajouter photo";
+
+        const submitPhotoContentLabel = document.createElement("label");
+        submitPhotoContentLabel.setAttribute("for","new-project-image");
+        submitPhotoContentLabel.setAttribute("id","image-preview");
+        submitPhotoContentLabel.innerText = "+ Ajouter photo";
         submitPhotoContentText = document.createElement("p");
         submitPhotoContentText.setAttribute("class","submit-photo-content-text");
         submitPhotoContentText.innerText = "jpg, png : 4mo max";
 
-        const submitPhotoForm = document.createElement("form");
-        submitPhotoForm.setAttribute("class","submit-photo-form");
-        
         const submitPhotoFormTitleLabel = document.createElement("label");
         submitPhotoFormTitleLabel.setAttribute("for","title");
         submitPhotoFormTitleLabel.innerText = "Titre";
@@ -495,29 +713,31 @@ const modalWindowAddPhoto = () => {
         submitPhotoFormTitleInput.setAttribute("name","title");
         submitPhotoFormTitleInput.setAttribute("id","title");
         submitPhotoFormTitleInput.setAttribute("class","submit-photo-form-input");
+        submitPhotoFormTitleInput.required = true;
 
         const submitPhotoFormCategoryLabel = document.createElement("label");
         submitPhotoFormCategoryLabel.setAttribute("for","category");
         submitPhotoFormCategoryLabel.innerText = "Catégorie";
-        const submitPhotoFormCategoryInput = document.createElement("input");
-        submitPhotoFormCategoryInput.setAttribute("list","category-choice");
+        const submitPhotoFormCategoryInput = document.createElement("select");
         submitPhotoFormCategoryInput.setAttribute("name","category");
         submitPhotoFormCategoryInput.setAttribute("id","category");
         submitPhotoFormCategoryInput.setAttribute("class","submit-photo-form-input");
+        submitPhotoFormCategoryInput.required = true;
 
-        const submitPhotoFormCategoryList = document.createElement("datalist");
-        submitPhotoFormCategoryList.setAttribute("id","category-choice");
-        submitPhotoFormCategoryOption1 = document.createElement("option");
-        submitPhotoFormCategoryOption1.setAttribute("value","catégorie 1");
+        const submitPhotoFormCategoryOption0 = document.createElement("option");
+        submitPhotoFormCategoryOption0.setAttribute("value","");
+
+        const submitPhotoFormCategoryOption1 = document.createElement("option");
+        submitPhotoFormCategoryOption1.setAttribute("value","1");
+        submitPhotoFormCategoryOption1.innerText = "Objets";
 
         const submitPhotoFormCategoryOption2 = document.createElement("option");
-        submitPhotoFormCategoryOption2.setAttribute("value","catégorie 2");
+        submitPhotoFormCategoryOption2.setAttribute("value","2");
+        submitPhotoFormCategoryOption2.innerText = "Appartements";
 
         const submitPhotoFormCategoryOption3 = document.createElement("option");
-        submitPhotoFormCategoryOption3.setAttribute("value","catégorie 3");
-
-        const submitPhotoFormCategoryOption4 = document.createElement("option");
-        submitPhotoFormCategoryOption4.setAttribute("value","catégorie 4");
+        submitPhotoFormCategoryOption3.setAttribute("value","3");
+        submitPhotoFormCategoryOption3.innerText = "Hôtels & restaurants";
 
         submitPhotoFormHr = document.createElement("hr");
 
@@ -526,34 +746,52 @@ const modalWindowAddPhoto = () => {
         submitPhotoFormSubmit.setAttribute("type","submit");
         submitPhotoFormSubmit.setAttribute("value","valider");
 
+        const errorMessage = document.createElement("p");
+        errorMessage.innerText = "Veuillez remplir tous les champs d'envoi";
+        errorMessage.setAttribute("class","missing-information no-missing-information");
+
+        const divNewProject = document.createElement("div");
+        divNewProject.setAttribute("class","new-project");
+        textDivNewProject = document.createElement("p");
+        textDivNewProject.innerText = "Projet ajouté avec succès";
+
         modalWindow.appendChild(iconWrapper);
         iconWrapper.appendChild(arrowIcon);
         previousWindowModal();
         iconWrapper.appendChild(closeIcon);
         closeModalCross();
         modalWindow.appendChild(adminTitle);
-        
-        modalWindow.appendChild(submitPhotoFrame);
+
+        modalWindow.appendChild(submitPhotoForm);
+        submitPhotoForm.appendChild(submitPhotoFrame);
+
+        submitPhotoFrame.appendChild(submitPhotoPreview);
+        submitPhotoPreview.appendChild(submitPhotoPreviewImage);
+        submitPhotoPreview.appendChild(divPreviewTrashIcon);
+        divPreviewTrashIcon.appendChild(previewTrashIcon);
         submitPhotoFrame.appendChild(submitPhotoContentIcon);
         submitPhotoFrame.appendChild(submitPhotoContentButton);
-        addPhoto();
+        submitPhotoFrame.appendChild(submitPhotoContentLabel);
         submitPhotoFrame.appendChild(submitPhotoContentText);
-        
-        modalWindow.appendChild(submitPhotoForm);
+
         submitPhotoForm.appendChild(submitPhotoFormTitleLabel);
         submitPhotoForm.appendChild(submitPhotoFormTitleInput);
         submitPhotoForm.appendChild(submitPhotoFormCategoryLabel);
         submitPhotoForm.appendChild(submitPhotoFormCategoryInput);
         
-        submitPhotoForm.appendChild(submitPhotoFormCategoryList);
-        submitPhotoFormCategoryList.appendChild(submitPhotoFormCategoryOption1);
-        submitPhotoFormCategoryList.appendChild(submitPhotoFormCategoryOption2);
-        submitPhotoFormCategoryList.appendChild(submitPhotoFormCategoryOption3);
-        submitPhotoFormCategoryList.appendChild(submitPhotoFormCategoryOption4);
+        submitPhotoFormCategoryInput.appendChild(submitPhotoFormCategoryOption0);
+        submitPhotoFormCategoryInput.appendChild(submitPhotoFormCategoryOption1);
+        submitPhotoFormCategoryInput.appendChild(submitPhotoFormCategoryOption2);
+        submitPhotoFormCategoryInput.appendChild(submitPhotoFormCategoryOption3);
+        
         submitPhotoForm.appendChild(submitPhotoFormHr);
         submitPhotoForm.appendChild(submitPhotoFormSubmit);
-        addProject();
+        submitPhotoForm.appendChild(divNewProject);
+        divNewProject.appendChild(textDivNewProject);
+        submitPhotoForm.appendChild(errorMessage);
 
+        addProject();
+        testSizePreviewImage();
     });
 };
 
@@ -572,5 +810,3 @@ const previousWindowModal = () => {
         modalWindowAddPhoto();
     });
 };
-
-//partie de code servant à ajouter un nouveau projet au moyen de formData
