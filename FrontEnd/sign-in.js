@@ -50,7 +50,6 @@ const testLogin = async (valueUserEmail, valueUserPassword) => {
                 "Access-Control-Allow-Origin": "*"
             },
         });
-        console.log("server status: " + responseLogin.status + responseLogin);
         const token = await responseLogin.json();
         const strigifiedToken = JSON.stringify(token);
         sessionStorage.setItem("token", strigifiedToken);
