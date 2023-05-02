@@ -333,15 +333,18 @@ footer nav ul {
 
 #edit-picture{
 	margin-left: 55px;
+	margin-top: 10px;
 }
 
 #edit-biography{
 	top: 260px;
+	margin-top: 5px;
 }
 
 #edit-project{
 	right: 37%;
-	top: 608px;;
+	top: 608px;
+	margin-top: 5px;
 }
 
 .modal-container {
@@ -536,7 +539,6 @@ hr {
 	border: none;
 	font-family: 'Work Sans';
 	font-size: 14px;
-	padding-left: 16px;
 }
 
 .submit-photo-form hr {
