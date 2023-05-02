@@ -38,7 +38,7 @@ const displayButton = () => {
 //Création dynamique des boutons
 const createButton = async () => {
     try {
-        //mise à zéro lors du rafraichiessement de cette liste
+        //mise à zéro lors du rafraichessement de cette liste
         //(ajout ou suppression de travaux)
         filterContainer.innerHTML="";
         const allTheWorks = await allWorks(); 
@@ -235,13 +235,13 @@ const getToken = () => {
 };
 
 // fonction de déconnection si token périmé
-// const tokenStatus = (serverStatus) => {
-//     if(serverStatus !== 204 || serverStatus !== 201){
-//         alert("Vous avez été déconnecté, veuillez vous reconnecter");
-//         sessionStorage.removeItem("token");
-//         location.reload();
-//     }
-// };
+const tokenStatus = (serverStatus) => {
+    if(serverStatus !== 204 && serverStatus !== 201){
+        alert("Vous avez été déconnecté, veuillez vous reconnecter");
+        sessionStorage.removeItem("token");
+        location.reload();
+    }
+};
 
 //fonction de deconnexion
 const logOut = (logoutButton) => {
@@ -714,8 +714,7 @@ const actionDeleteWork = async (projectNumber, token) => {
                 "authorization": "Bearer " + token 
             },
         });
-        // console.log(responseDelete.status);
-        // tokenStatus(responseDelete.status);
+        tokenStatus(responseDelete.status);
     } catch (err) {
         console.error(err);
     }
@@ -752,8 +751,7 @@ const actionDeleteAllWorks = async (token) => {
                     "authorization": "Bearer " + token 
                 },
             });
-            // console.log(responseDeleteAll.status);
-            // tokenStatus(responseDeleteAll.status);
+            tokenStatus(responseDeleteAll.status);
             deleteAllWorks();    
         }
     } catch (err) {
@@ -806,8 +804,7 @@ const fetchSendProjectFile = async (token, project) => {
             },
             body: project
         });
-        // console.log(responseSendProject.status);
-        // tokenStatus(responseSendProject.status);
+        tokenStatus(responseSendProject.status);
     } catch (err) {
         console.error(err);
     }

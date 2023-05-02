@@ -9,26 +9,28 @@ emailError.innerText = "Erreur dans l’identifiant ou le mot de passe";
 const parentToAppend = document.getElementById("loginMessage");
 
 //évènement une fois que l'utilisateur clique sur "se connecter", test du token
-const getData = document.getElementById("signIn").addEventListener("submit", async (event) => {
-    //permet d'éviter le comportement par défaut de rechargement de page
-    event.preventDefault();
-    try {
-        const valueUserEmail = userEmail.value;
-        const valueUserPassword = userPassword.value;
+const getData = () => {
+    document.getElementById("signIn").addEventListener("submit", async (event) => {
+        //permet d'éviter le comportement par défaut de rechargement de page
+        event.preventDefault();
+        try {
+            const valueUserEmail = userEmail.value;
+            const valueUserPassword = userPassword.value;
 
-        const userToken = await testLogin(valueUserEmail, valueUserPassword);
-        if (!userToken) {
-            //affichage du message d'erreur
-            parentToAppend.innerHTML = "";
-            parentToAppend.appendChild(emailError);
-        } else {
-            parentToAppend.innerHTML = "";
-            window.location.href = "index.html";
+            const userToken = await testLogin(valueUserEmail, valueUserPassword);
+            if (!userToken) {
+                //affichage du message d'erreur
+                parentToAppend.innerHTML = "";
+                parentToAppend.appendChild(emailError);
+            } else {
+                parentToAppend.innerHTML = "";
+                window.location.href = "index.html";
+            }
+        } catch (error) {
+            console.log(error);
         }
-    } catch (error) {
-        console.log(error);
-    }
-});
+    });
+};
 
 getData();
 
