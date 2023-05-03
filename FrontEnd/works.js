@@ -565,6 +565,10 @@ const previewImage = () => {
     let imageUrl = document.querySelector("#new-project-image");
     const fileExtentionRegex = /\.(jpe?g|png)$/i;
     if(imageUrl.files.length === 0 || !fileExtentionRegex.test(imageUrl.files[0].name)){
+        const clearPreviewInput = document.getElementById("new-project-image");
+        if(clearPreviewInput.value !==""){
+            clearPreviewInput.value = "";
+        }
         return;
     }
     const div = document.querySelector(".submit-photo-preview");
@@ -608,36 +612,6 @@ const removeDisplayPreview = () => {
     }
     const previewImage = document.querySelector(".submit-photo-preview-image");
     previewImage.src = "";
-};
-
-//partie de code servant à ajouter un nouveau projet au moyen de formData
-const sendNewprojectFiles = async (imageUrl, title, category) => {
-    try {
-        const projectTitle = title;
-        const projectImageUrl = imageUrl;
-        const projectCategoryId = category;
-
-        let sendNewProject = new FormData();
-        sendNewProject.append("image", projectImageUrl);
-        sendNewProject.append("title", projectTitle);
-        sendNewProject.append("category", projectCategoryId);
-
-        let object = {};
-        sendNewProject.forEach((value, key) => (object[key] = value));
-        await actionSendProjectFile(getToken(), sendNewProject);
-        newProjectConfirmation();
-    }catch(err){
-        console.error(err);
-    }
-};
-
-//notification d'ajout de projet
-const newProjectConfirmation = () => {
-    const divNewProject = document.querySelector(".new-project");
-    divNewProject.classList.add("class","sent");
-    setTimeout( ()=> {
-        divNewProject.classList.remove("sent");
-    }, 1000);
 };
 
 //code servant à revenir à la précédente fenêtre modale
@@ -694,6 +668,9 @@ const closeModalKey = () => {
     });
 };
 
+/*
+Suppression des projets
+*/
 //évènement au clic sur la corbeille de chaque projet
 const deleteWork = () => {
     const deleteWorkIcon = document.querySelectorAll(".trash-icon-container");
@@ -767,6 +744,39 @@ const actionDeleteAllWorks = async (token) => {
     } catch (err) {
         console.error(err);
     }
+};
+
+/*
+Ajout d'un nouveau projet
+*/
+//partie de code servant à ajouter un nouveau projet au moyen de formData
+const sendNewprojectFiles = async (imageUrl, title, category) => {
+    try {
+        const projectTitle = title;
+        const projectImageUrl = imageUrl;
+        const projectCategoryId = category;
+
+        let sendNewProject = new FormData();
+        sendNewProject.append("image", projectImageUrl);
+        sendNewProject.append("title", projectTitle);
+        sendNewProject.append("category", projectCategoryId);
+
+        let object = {};
+        sendNewProject.forEach((value, key) => (object[key] = value));
+        await actionSendProjectFile(getToken(), sendNewProject);
+        newProjectConfirmation();
+    }catch(err){
+        console.error(err);
+    }
+};
+
+//notification d'ajout de projet
+const newProjectConfirmation = () => {
+    const divNewProject = document.querySelector(".new-project");
+    divNewProject.classList.add("class","sent");
+    setTimeout( ()=> {
+        divNewProject.classList.remove("sent");
+    }, 1000);
 };
 
 //bouton valider: ajouter projet
