@@ -154,55 +154,6 @@ getAllWorks();
 displayButton();
 
 /*
-récupération travaux fenêtre administation
-*/
-//récupération dynamique des travaux dans la fenêtre modale
-const adminGetAllWorks = async () => {
-    try{
-        //supression de la liste de travaux
-        const works = await allWorks(); 
-        const adminWorks = document.querySelector("#photo-edit-container");
-        adminWorks.innerHTML="";
-        for(let i=0; i < works.length; i++){
-            //création d'éléments
-            const containerElement = document.createElement("div");
-            containerElement.setAttribute("class","photo-edit-card");
-            const imageWrapperElement = document.createElement("figure");
-            const iconWrapper = document.createElement("div");
-            iconWrapper.setAttribute("class","icon-container-wrapper");
-            const trashIconWrapper = document.createElement("div");
-            trashIconWrapper.setAttribute("class","icon-container trash-icon-container");
-            trashIconWrapper.setAttribute("id",works[i].id);
-            const trashIcon = document.createElement("i");
-            trashIcon.setAttribute("class","fa-solid fa-trash-can");
-            const arrowIconWrapper = document.createElement("div");
-            arrowIconWrapper.setAttribute("class","icon-container arrow-icon-container");
-            const arrowIcon = document.createElement("i");
-            arrowIcon.setAttribute("class","fa-solid fa-arrows-up-down-left-right");
-            const imageElement = document.createElement("img");
-            imageElement.src = works[i].imageUrl;
-            imageElement.setAttribute("alt",works[i].title);
-            const figcaptionElement = document.createElement("figcaption");
-            figcaptionElement.innerText = "éditer";
-
-            //insertion de l'élément dans le DOM
-            adminWorks.appendChild(containerElement);
-            containerElement.appendChild(imageWrapperElement);
-            imageWrapperElement.appendChild(iconWrapper);
-            iconWrapper.appendChild(trashIconWrapper);
-            trashIconWrapper.appendChild(trashIcon);
-            iconWrapper.appendChild(arrowIconWrapper);
-            arrowIconWrapper.appendChild(arrowIcon);
-            imageWrapperElement.appendChild(imageElement);
-            imageWrapperElement.appendChild(figcaptionElement);
-        }
-        deleteWork();
-    }catch(err){
-        console.log(err);
-    }
-};
-
-/*
 partie dédiée à la la section administration et la fenêtre modale
 */
 
@@ -357,6 +308,58 @@ const displayModal = () => {
     });
 };
 
+/*
+récupération travaux fenêtre administation
+*/
+//récupération dynamique des travaux dans la fenêtre modale
+const adminGetAllWorks = async () => {
+    try{
+        //supression de la liste de travaux
+        const works = await allWorks(); 
+        const adminWorks = document.querySelector("#photo-edit-container");
+        adminWorks.innerHTML="";
+        for(let i=0; i < works.length; i++){
+            //création d'éléments
+            const containerElement = document.createElement("div");
+            containerElement.setAttribute("class","photo-edit-card");
+            const imageWrapperElement = document.createElement("figure");
+            const iconWrapper = document.createElement("div");
+            iconWrapper.setAttribute("class","icon-container-wrapper");
+            const trashIconWrapper = document.createElement("div");
+            trashIconWrapper.setAttribute("class","icon-container trash-icon-container");
+            trashIconWrapper.setAttribute("id",works[i].id);
+            const trashIcon = document.createElement("i");
+            trashIcon.setAttribute("class","fa-solid fa-trash-can");
+            const arrowIconWrapper = document.createElement("div");
+            arrowIconWrapper.setAttribute("class","icon-container arrow-icon-container");
+            const arrowIcon = document.createElement("i");
+            arrowIcon.setAttribute("class","fa-solid fa-arrows-up-down-left-right");
+            const imageElement = document.createElement("img");
+            imageElement.src = works[i].imageUrl;
+            imageElement.setAttribute("alt",works[i].title);
+            const figcaptionElement = document.createElement("figcaption");
+            figcaptionElement.innerText = "éditer";
+
+            //insertion de l'élément dans le DOM
+            adminWorks.appendChild(containerElement);
+            containerElement.appendChild(imageWrapperElement);
+            imageWrapperElement.appendChild(iconWrapper);
+            iconWrapper.appendChild(trashIconWrapper);
+            trashIconWrapper.appendChild(trashIcon);
+            iconWrapper.appendChild(arrowIconWrapper);
+            arrowIconWrapper.appendChild(arrowIcon);
+            imageWrapperElement.appendChild(imageElement);
+            imageWrapperElement.appendChild(figcaptionElement);
+        }
+        deleteWork();
+    }catch(err){
+        console.log(err);
+    }
+};
+
+/*
+fenêtre modale
+*/
 // création de la première fenêtre modale
 const createModalWindow = () => {
     const modalWindow = document.querySelector(".modal-window");
@@ -557,6 +560,7 @@ const testSizePreviewImage = () => {
     });
 };
 
+//traitement des données liées à l'image de prévisualisation du formulaire
 const previewImage = () => {
     let imageUrl = document.querySelector("#new-project-image");
     const fileExtentionRegex = /\.(jpe?g|png)$/i;
@@ -577,6 +581,7 @@ const previewImage = () => {
     });
 };
 
+//insertion dans le DOM de l'image de prévisualisation du formulaire
 const displayPreview = (event) => {
     const imageDiv = document.querySelector(".submit-photo-preview-image");
     imageDiv.src = event.target.result;
@@ -588,6 +593,7 @@ const displayPreview = (event) => {
     });
 };
 
+//suppression de l'image de prévisualisation du formulaire
 const removeDisplayPreview = () => {
     const addPhotoButton = document.querySelector("#image-preview");
     const div = document.querySelector(".submit-photo-preview");
@@ -618,7 +624,7 @@ const sendNewprojectFiles = async (imageUrl, title, category) => {
 
         let object = {};
         sendNewProject.forEach((value, key) => (object[key] = value));
-        await fetchSendProjectFile(getToken(), sendNewProject);
+        await actionSendProjectFile(getToken(), sendNewProject);
         newProjectConfirmation();
     }catch(err){
         console.error(err);
@@ -701,7 +707,7 @@ const deleteWork = () => {
                 adminGetAllWorks();
                 createButton();
                 getAllWorks();
-                return false;
+                return false; 
             }
         }, false );
     });
@@ -797,7 +803,8 @@ const addProject = () => {
     }
 };
 
-const fetchSendProjectFile = async (token, project) => {
+//envoi des projets au back-end
+const actionSendProjectFile = async (token, project) => {
     try {
         const responseSendProject = await fetch("http://localhost:5678/api/works", {
             method: "POST",
