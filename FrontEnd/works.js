@@ -547,6 +547,10 @@ const testSizePreviewImage = () => {
     imageUrl.addEventListener("change", () => {
         if(imageUrl.files[0].size > 4000000){
             alert("le fichier est trop lourd, il ne sera pas chargé");
+            const clearPreviewInput = document.getElementById("new-project-image");
+            if(clearPreviewInput.value !==""){
+                clearPreviewInput.value = "";
+            }
         }else{
             previewImage();
         }
