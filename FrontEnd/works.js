@@ -193,15 +193,31 @@ const tokenStatus = (serverStatus) => {
         location.reload();
     }
 };
+/*
+Partie déconnexion
+*/
 
 //fonction de deconnexion
 const logOut = (logoutButton) => {
-    logoutButton.addEventListener( "click", () => {
+    logoutButton.addEventListener( "click", (event) => {
+        event.preventDefault();
         sessionStorage.removeItem("token");
         location.reload();
     });
 };
 
+//déconnexion au clic du lien logout
+const linkLogOut = () => {
+    if(!isToken()){
+        return false;
+    }else{
+        const htmlLinkLogOut = document.querySelector(".login");
+        htmlLinkLogOut.innerText="logout";
+        logOut(htmlLinkLogOut);
+    }
+};
+
+linkLogOut();
 
 /*
 Interface d'aministration
